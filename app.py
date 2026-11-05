@@ -1,4 +1,5 @@
 import os
+import hmac
 import json
 import sqlite3
 import shutil
@@ -95,8 +96,6 @@ def persist_marketplace_data(response):
     # Save changes after requests so seller approvals, listings, carts and orders persist.
     save_data()
     return response
-ADMIN_USERNAME = os.environ.get("SHOPMOBI_ADMIN", "admin")
-ADMIN_PASSWORD_HASH = generate_password_hash(os.environ.get("SHOPMOBI_ADMIN_PASSWORD", "ChangeMe123!"))
 
 CSS = r"""
 :root{--bg:#f1f2ec;--surface:#fff;--surface2:#e7e9df;--text:#172018;--muted:#687267;--line:#dce1d7;--green:#173d2b;--green2:#2d6444;--accent:#a8c66c;--black:#080b09;--shadow:0 12px 35px rgba(18,40,24,.08)}
@@ -555,11 +554,19 @@ def product_delete(product_id):
 @app.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
     if request.method == "POST":
-        if request.form.get("username", "") == ADMIN_USERNAME and check_password_hash(ADMIN_PASSWORD_HASH, request.form.get("password", "")):
+        # Read the Render variables at login time so the latest configured
+        # credentials are used, even if the module was imported earlier.
+        configured_username = os.environ.get("SHOPMOBI_ADMIN", "admin").strip()
+        configured_password = os.environ.get("SHOPMOBI_ADMIN_PASSWORD", "ChangeMe123!").strip()
+        submitted_username = request.form.get("username", "").strip()
+        submitted_password = request.form.get("password", "").strip()
+        username_ok = hmac.compare_digest(submitted_username, configured_username)
+        password_ok = hmac.compare_digest(submitted_password, configured_password)
+        if username_ok and password_ok:
             session["is_admin"] = True
             return redirect(url_for("admin_dashboard"))
         flash("Incorrect admin username or password.")
-    content = r'''<div class="section-head"><div><h2>Admin sign in</h2><p>Manage the Shopmobi marketplace.</p></div></div><div class="panel"><form method="post"><div class="field"><label>Username</label><input name="username" required></div><div class="field"><label>Password</label><input type="password" name="password" required></div><button class="btn-green">Sign in</button></form><p class="muted small">Demo credentials: admin / ChangeMe123!</p></div>'''
+    content = r'''<div class="section-head"><div><h2>Admin sign in</h2><p>Manage the Shopmobi marketplace.</p></div></div><div class="panel"><form method="post"><div class="field"><label>Username</label><input name="username" autocomplete="username" required></div><div class="field"><label>Password</label><input type="password" name="password" autocomplete="current-password" required></div><button class="btn-green">Sign in</button></form><p class="muted small">Use the admin credentials configured in your Render environment variables.</p></div>'''
     return render_page("Admin sign in", content)
 
 
