@@ -149,7 +149,7 @@ html[data-theme="dark"]{--bg:#111a14;--surface:#1b2820;--surface2:#26362a;--text
 
 BASE = r'''<!doctype html><html lang="en" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{{ title }} · Shopmobi</title><style>''' + CSS + r'''</style></head><body>
 <div class="topbar"><div class="wrap nav"><a class="logo" href="{{ url_for('home') }}">shop<span>mobi.</span></a>
-<nav class="navlinks"><a href="{{ url_for('home') }}">Discover</a><a href="{{ url_for('home', category='Home & Living') }}">Home & Living</a><a href="{{ url_for('home', category='Fashion') }}">Fashion</a><a href="{{ url_for('merchant_register') }}">Sell with us</a></nav>
+<nav class="navlinks"><a href="{{ url_for('home') }}">Discover</a><a href="{{ url_for('home', category='Home & Living') }}">Home & Living</a><a href="{{ url_for('home', category='Fashion') }}">Fashion</a><a href="{{ url_for('merchant_register') }}">Sell with us</a><a href="{{ url_for('merchant_login') }}">Seller sign in</a></nav>
 <div class="navactions"><form class="search" method="get" action="{{ url_for('home') }}"><span>⌕</span><input name="q" value="{{ request.args.get('q','') }}" placeholder="Search products"></form><a class="btn btn-light" href="{{ url_for('cart') }}" aria-label="Cart">♧ <span>{{ cart_count }}</span></a><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle night mode">☾</button></div></div></div>
 <main class="wrap">{% with messages=get_flashed_messages() %}{% for message in messages %}<div class="notice">{{ message }}</div>{% endfor %}{% endwith %}{{ content|safe }}</main>
 <div class="mobile-bottom"><a href="{{ url_for('home') }}"><b>⌂</b>Shop</a><a href="{{ url_for('favorites_page') }}"><b>♡</b>Saved</a><a href="{{ url_for('cart') }}"><b>♧</b>Cart</a><a href="{{ url_for('merchant_login') }}"><b>♙</b>Seller</a><a href="{{ url_for('admin_login') }}"><b>⚙</b>Admin</a></div>
@@ -432,7 +432,7 @@ def merchant_register():
             next_merchant_id += 1
             flash("Seller application submitted. Please wait for admin approval.")
             return redirect(url_for("merchant_login"))
-    content = r'''<div class="section-head"><div><h2>Become a seller</h2><p>Bring your products to the Shopmobi community.</p></div></div><div class="panel"><form method="post"><div class="field"><label>Business or seller name</label><input name="name" required></div><div class="field"><label>Email address</label><input type="email" name="email" required></div><div class="field"><label>Password (minimum 8 characters)</label><input type="password" name="password" minlength="8" required></div><button class="btn-green">Submit application ↗</button></form></div>'''
+    content = r'''<div class="section-head"><div><h2>Become a seller</h2><p>Bring your products to the Shopmobi community.</p></div></div><div class="panel"><form method="post"><div class="field"><label>Business or seller name</label><input name="name" required></div><div class="field"><label>Email address</label><input type="email" name="email" required></div><div class="field"><label>Password (minimum 8 characters)</label><input type="password" name="password" minlength="8" required></div><button class="btn-green">Submit application ↗</button></form><p class="muted" style="margin-top:16px">Already have a Shopmobi seller account? <a href="{{ url_for('merchant_login') }}"><strong>Sign in here</strong></a>.</p></div>'''
     return render_page("Seller application", content)
 
 
