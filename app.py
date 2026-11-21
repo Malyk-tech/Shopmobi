@@ -9,6 +9,14 @@ from werkzeug.exceptions import HTTPException
 from supabase import create_client
 
 app = Flask(__name__)
+
+@app.get('/health')
+def health_check():
+    response = app.make_response(('ok', 200))
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate'
+    return response
+
 app.secret_key = os.environ.get('SHOPMOBI_SECRET') or os.urandom(32).hex()
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024
 ALLOWED = {'jpg','jpeg','png','webp'}
