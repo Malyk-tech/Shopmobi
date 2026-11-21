@@ -178,7 +178,10 @@ def product_detail(product_id):
     raw=one('products',id=product_id)
     if not raw or not raw.get('is_active'): flash('Product not found.'); return redirect(url_for('home'))
     p=public_product(raw)
-    content=r'''<div class="section-head"><a class="muted" href="{{ url_for('home') }}">← Back to catalog</a></div><section class="detail-grid"><div class="detail-photo">{% if p.image %}<img src="{{ p.image }}" alt="{{ p.name }}">{% else %}✦{% endif %}</div><div><div class="product-meta">{{ p.category }} · Sold by {{ p.seller_name }}</div><h1 class="detail-title">{{ p.name }}</h1><div class="price">KSh {{ '%.2f'|format(p.price) }}</div><p class="muted">{{ p.description }}</p><p class="stock">{{ p.stock }} available</p><form method="post" action="{{ url_for('add_to_cart',product_id=p.id) }}"><input type="number" name="quantity" value="1" min="1" max="{{ p.stock }}"><button class="btn-green">Add to cart</button></form><p class="muted small">Demo checkout only. No real payments are collected.</p></div></section>'''
+    content=r'''<div class="section-head"><a class="muted" href="{{ url_for('home') }}">← Back to catalog</a></div><section class="detail-grid"><div class="detail-photo">{% if p.image %}<img src="{{ p.image }}" alt="{{ p.name }}">{% else %}✦{% endif %}</div><div><div class="product-meta">{{ p.category }} · Sold by {{ p.seller_name }}</div><h1 class="detail-title">{{ p.name }}</h1><div class="price">KSh {{ '%.2f'|format(p.price) }}</div><p class="muted">{{ p.description }}</p><p class="stock">{{ p.stock }} available</p><form class="product-buy-controls" method="post" action="{{ url_for('add_to_cart',product_id=p.id) }}">
+    <input type="number" name="quantity" value="1" min="1" max="{{ p.stock }}">
+    <button class="btn-green" type="submit">Add to cart</button>
+</form><p class="muted small">Demo checkout only. No real payments are collected.</p></div></section>'''
     return render_page(p['name'],content,p=p)
 
 @app.route('/cart')
