@@ -535,7 +535,12 @@ ADMIN_HASH=generate_password_hash(ADMIN_PASSWORD) if ADMIN_PASSWORD else None
 def admin_login():
     if request.method=='POST':
         password=request.form.get('password','')
-        if request.form.get('username','')==ADMIN_USERNAME and ADMIN_HASH and check_password_hash(ADMIN_HASH,password): session['is_admin']=True; return redirect(url_for('admin_dashboard'))
+        submitted_username=request.form.get('username','')
+        username_match=(submitted_username.strip()==ADMIN_USERNAME.strip())
+        password_configured=bool(ADMIN_PASSWORD and ADMIN_HASH)
+        password_match=bool(ADMIN_HASH and check_password_hash(ADMIN_HASH,password))
+        app.logger.warning('ADMIN LOGIN DIAGNOSTIC username_match=%s password_configured=%s password_match=%s', username_match, password_configured, password_match)
+        if username_match and password_match: session['is_admin']=True; return redirect(url_for('admin_dashboard'))
         flash('Incorrect admin username or password.')
     return render_page('Admin sign in',r'''<div class="panel"><h2>Admin sign in</h2><form method="post"><div class="field"><label>Username</label><input name="username" required></div><div class="field"><label>Password</label><input name="password" type="password" required></div><button class="btn-green">Sign in</button></form></div>''')
 @app.route('/admin/logout')
